@@ -2,7 +2,7 @@ package cn.edu.shiep.backend.meetingroom.controller;
 
 import cn.edu.shiep.backend.meetingroom.dto.request.ReservationRequest;
 import cn.edu.shiep.backend.meetingroom.dto.response.ReservationResponse;
-import cn.edu.shiep.backend.meetingroom.security.service.UserDetailsImpl; // 导入我们的自定义UserDetails
+import cn.edu.shiep.backend.meetingroom.security.services.UserDetailsImpl;
 import cn.edu.shiep.backend.meetingroom.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,24 +20,21 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
-    // 创建新预约
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationRequest dto,
                                                                     @AuthenticationPrincipal UserDetails userDetails) {
-        // 1. 将Spring Security提供的UserDetails向下转型为我们的实现类
+        // 将Spring Security提供的UserDetails向下转型为我们的实现类
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
-        // 2. 调用我们自定义的getId()方法，安全地获取用户ID
-        Long userId = userDetailsImpl.getId();
+        Integer userId = userDetailsImpl.getId();
 
-        ReservationResponse response = reservationService.createReservation(dto, userId);
+        ReservationResponse response = reservationService.createReservation(dto, Long.valueOf(userId));
         return ResponseEntity.ok(response);
     }
 
-    // 获取我的所有预约
     @GetMapping("/my")
     public ResponseEntity<List<ReservationResponse>> getMyReservations(@AuthenticationPrincipal UserDetails userDetails) {
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
-        Long userId = userDetailsImpl.getId();
+        Integer userId = userDetailsImpl.getId();
 
         List<ReservationResponse> reservations = reservationService.getMyReservations(userId);
         return ResponseEntity.ok(reservations);

@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { getAllRooms } from '@/services/roomService'
 import RoomCard from '@/components/RoomCard.vue'
+import { toast } from 'vue-sonner'
 
 const rooms = ref([])
 const isLoading = ref(true)
@@ -11,7 +12,7 @@ onMounted(async () => {
     const response = await getAllRooms()
     rooms.value = response.data
   } catch (error) {
-    console.error('获取会议室列表失败:', error)
+    toast.error('获取会议室列表失败', { description: error instanceof Error ? error.message : '未知错误' })
   } finally {
     isLoading.value = false
   }

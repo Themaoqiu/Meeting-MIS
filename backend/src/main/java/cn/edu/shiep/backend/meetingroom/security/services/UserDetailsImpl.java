@@ -17,18 +17,19 @@ import java.util.stream.Collectors;
 public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private Long id;
 
     private String username;
 
     private String email;
 
+    // json化时忽略密码字段
     @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Integer id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Long id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -37,9 +38,11 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
+        // 用户role属性->GrantedAuthority 对象->列表
         GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().name());
         List<GrantedAuthority> authorities = Collections.singletonList(authority);
 
+        // 转换为Spring Security 需要的 UserDetailsImpl 对象
         return new UserDetailsImpl(
                 user.getUserId(),
                 user.getName(),
@@ -47,22 +50,6 @@ public class UserDetailsImpl implements UserDetails {
                 user.getPassword(),
                 authorities);
     }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
     @Override
     public boolean isAccountNonExpired() { return true; }
     @Override

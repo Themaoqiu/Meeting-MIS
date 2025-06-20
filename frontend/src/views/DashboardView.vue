@@ -1,59 +1,82 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getTodaysReservations } from '@/services/reservationService'
-import { Button } from '@/components/ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { RouterLink } from 'vue-router'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Home, Calendar, UserCheck } from 'lucide-vue-next'
+import apiClient from '@/services/api'
+import { toast } from 'vue-sonner';
 
-const todaysReservations = ref([])
+const stats = ref({
+  totalRooms: 0,
+  todaysMeetings: 0,
+  myUpcomingMeetings: 0,
+});
+
+const isLoading = ref(true);
 
 onMounted(async () => {
   try {
-    const response = await getTodaysReservations()
-    todaysReservations.value = response.data
-  } catch (error) {
-    console.error('获取今日会议失败:', error)
+    const response = await apiClient.get('/dashboard/stats');
+    stats.value = response.data;
+  } catch (error: any) {
+    toast.error('获取仪表盘数据失败', {
+      description: error.response?.data || 'Network Error: 无法连接到服务器。',
+    });
+  } finally {
+    isLoading.value = false;
   }
-})
-
-// 格式化时间
-const formatTime = (datetime: string) => new Date(datetime).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+});
 </script>
 
 <template>
-  <div class="space-y-6">
-    <div class="flex justify-between items-center">
-      <h1 class="text-2xl font-bold">仪表盘</h1>
-      <Button as-child>
-        <RouterLink to="/reservations/new">快速预约会议</RouterLink>
-      </Button>
+  <div>
+    <h1 class="text-2xl font-bold mb-6">总览仪表盘</h1>
+    <div v-if="isLoading" class="text-center">加载中...</div>
+    <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <Card>
+        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle class="text-sm font-medium">
+            会议室总数
+          </CardTitle>
+          <Home class="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-bold">{{ stats.totalRooms }}</div>
+          <p class="text-xs text-muted-foreground">
+            系统中所有可用的会议室种类
+          </p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle class="text-sm font-medium">
+            今日会议总数
+          </CardTitle>
+          <Calendar class="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-bold">{{ stats.todaysMeetings }}</div>
+          <p class="text-xs text-muted-foreground">
+            今天所有已确认的会议安排
+          </p>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle class="text-sm font-medium">
+            我未来的预约
+          </CardTitle>
+          <UserCheck class="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div class="text-2xl font-bold">{{ stats.myUpcomingMeetings }}</div>
+          <p class="text-xs text-muted-foreground">
+            您所有尚未结束的会议预约
+          </p>
+        </CardContent>
+      </Card>
     </div>
 
-    <div>
-      <h2 class="text-xl font-semibold mb-4">今日会议</h2>
-      <div class="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>主题</TableHead>
-              <TableHead>会议室</TableHead>
-              <TableHead>时间</TableHead>
-              <TableHead>预约人</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow v-if="todaysReservations.length === 0">
-              <TableCell colspan="4" class="text-center text-muted-foreground">今日暂无会议</TableCell>
-            </TableRow>
-            <TableRow v-for="reservation in todaysReservations" :key="reservation.reservationId">
-              <TableCell>{{ reservation.theme }}</TableCell>
-              <TableCell>{{ reservation.roomName }}</TableCell>
-              <TableCell>{{ formatTime(reservation.startTime) }} - {{ formatTime(reservation.endTime) }}</TableCell>
-              <TableCell>{{ reservation.userName }}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+    <div class="mt-8">
       </div>
-    </div>
   </div>
 </template>

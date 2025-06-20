@@ -10,7 +10,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    private int userId;
+    private Long userId;
     private String name;
     private String email;
     private String phone;

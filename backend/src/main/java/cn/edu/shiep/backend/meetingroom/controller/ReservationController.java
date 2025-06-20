@@ -20,21 +20,23 @@ public class ReservationController {
     @Autowired
     private ReservationService reservationService;
 
+    // @RequestBody 接收 JSON 格式的预约请求数据
+    // @AuthenticationPrincipal 是Spring Security 提供的当前登录用户信息
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationRequest dto,
                                                                     @AuthenticationPrincipal UserDetails userDetails) {
-        // 将Spring Security提供的UserDetails向下转型为我们的实现类
+        // 将Spring Security提供的UserDetails向下转型为实现类
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
-        Integer userId = userDetailsImpl.getId();
+        Long userId = userDetailsImpl.getId();
 
-        ReservationResponse response = reservationService.createReservation(dto, Long.valueOf(userId));
+        ReservationResponse response = reservationService.createReservation(dto, userId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/my")
     public ResponseEntity<List<ReservationResponse>> getMyReservations(@AuthenticationPrincipal UserDetails userDetails) {
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
-        Integer userId = userDetailsImpl.getId();
+        Long userId = userDetailsImpl.getId();
 
         List<ReservationResponse> reservations = reservationService.getMyReservations(userId);
         return ResponseEntity.ok(reservations);
@@ -49,10 +51,10 @@ public class ReservationController {
 
     // 取消预约
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> cancelReservation(@PathVariable Integer id,
+    public ResponseEntity<Void> cancelReservation(@PathVariable Long id,
                                                   @AuthenticationPrincipal UserDetails userDetails) {
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl) userDetails;
-        Integer userId = userDetailsImpl.getId();
+        Long userId = userDetailsImpl.getId();
 
         reservationService.cancelReservation(id, userId);
         return ResponseEntity.noContent().build();

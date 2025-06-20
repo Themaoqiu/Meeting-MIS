@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { toast } from 'vue-sonner';
+import { Toaster } from 'vue-sonner';
 import { useAuthStore } from '@/stores/auth';
 import { RouterLink } from 'vue-router';
 
@@ -14,23 +14,14 @@ const password = ref('');
 
 const handleLogin = async () => {
   if (!email.value || !password.value) {
-    // 2. API 调用方式改变，更简洁
-    toast.error('错误', {
-      description: '邮箱和密码不能为空。',
-    });
+    toast.error('错误', {description: '邮箱和密码不能为空。',});
     return;
   }
   try {
     await authStore.login({ email: email.value, password: password.value });
-    // 使用 toast.success 来显示成功状态
-    toast.success('登录成功', {
-      description: '即将跳转到主面板...',
-    });
+    toast.success('登录成功', {description: '即将跳转到主面板...',});
   } catch (error) {
-    // 使用 toast.error 来显示失败状态
-    toast.error('登录失败', {
-      description: error.response?.data || '请检查您的邮箱和密码。',
-    });
+    toast.error('登录失败', {description: error.response?.data || '请检查您的邮箱和密码'});
   }
 };
 </script>

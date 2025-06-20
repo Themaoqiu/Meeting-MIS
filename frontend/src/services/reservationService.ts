@@ -2,20 +2,20 @@ import apiClient from './api';
 
 // 获取今日所有预约
 export const getTodaysReservations = () => {
-  return apiClient.get('/api/reservations/today');
+  return apiClient.get('/reservations/today');
 };
 
 // 获取我自己的所有预约
 export const getMyReservations = () => {
-  return apiClient.get('/api/reservations/my');
+  return apiClient.get('/reservations/my');
 };
 
 // 创建一个新的预约
 export const createReservation = (data: any) => {
-  return apiClient.post('/api/reservations', data);
+  return apiClient.post('/reservations', data);
 };
 
 // 取消一个预约
 export const cancelReservation = (id: number) => {
-  return apiClient.delete(`/api/reservations/${id}`);
+  return apiClient.delete(`/reservations/${id}`);
 };

@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 public class EquipmentDTO {
-    private Integer equipmentId;
+    private Long equipmentId;
     private String deviceName;
     private EquipmentType type;
     private EquipmentStatus status;

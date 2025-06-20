@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ReservationResponse {
-    private Integer reservationId;
+    private Long reservationId;
     private String theme;
     private int personNum;
     private LocalDateTime startTime;

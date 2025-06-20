@@ -34,12 +34,12 @@ public class AuthService {
             throw new RuntimeException("错误: 邮箱已被注册!");
         }
 
-        // 加密
+        // 密码加密
         String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
 
         User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), encodedPassword, signupRequest.getPhone());
 
-        // 默认 USER 角色
+        // 默认设定为 USER 角色
         Roles userRole = roleRepository.findByName(ERole.USER).orElseThrow(() -> new RuntimeException("错误: 默认用户角色 'USER' 未在数据库中找到。"));
         user.setRole(userRole);
 
@@ -47,8 +47,7 @@ public class AuthService {
     }
 
     public UserDTO login(LoginRequest loginRequest, HttpServletRequest request) {
-        User user = userRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("错误: 用户不存在。"));
+        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("错误: 用户不存在。"));
 
         // 验证密码
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
@@ -69,7 +68,8 @@ public class AuthService {
     }
 
     public UserDTO checkStatus(HttpSession session) {
-        Integer userId = (Integer) session.getAttribute("userId");
+        // 会话中获取userid转换成int，如果为null说明没登录
+        Long userId = (Long) session.getAttribute("userId");
         if (userId == null) {
             return null;
         }

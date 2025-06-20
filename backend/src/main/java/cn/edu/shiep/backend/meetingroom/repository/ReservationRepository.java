@@ -11,15 +11,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ReservationRepository extends JpaRepository<Reservation, Integer> {
-    List<Reservation> findByUser_UserId(Integer userId);
+public interface ReservationRepository extends JpaRepository<Reservation, Long> {
+    List<Reservation> findByUser_UserId(Long userId);
     List<Reservation> findByStartTimeBetween(LocalDateTime startTime, LocalDateTime endTime);
     List<Reservation> findByStartTimeBetweenAndStatus(LocalDateTime start, LocalDateTime end, ReservationStatus status);
+    long countByStartTimeBetweenAndStatus(LocalDateTime startTime, LocalDateTime endTime, ReservationStatus status);
+    long countByUser_UserIdAndEndTimeAfterAndStatus(Long userId, LocalDateTime now, ReservationStatus status);
     // 看某个会议室在指定时间段是否有冲突预约
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.conferenceRoom.roomId = :roomId " +
             "AND r.status = 'CONFIRMED' " +
             "AND ((r.startTime < :endTime AND r.endTime > :startTime))")
-    long countConflictingReservations(@Param("roomId") Integer roomId,
+    long countConflictingReservations(@Param("roomId") Long roomId,
                                       @Param("startTime") LocalDateTime startTime,
                                       @Param("endTime") LocalDateTime endTime);
 }

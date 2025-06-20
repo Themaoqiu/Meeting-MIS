@@ -18,7 +18,7 @@ import java.util.List;
 public class ConferenceRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer roomId;
+    private Long roomId;
 
     @Column(unique = true, nullable = false)
     private String name;

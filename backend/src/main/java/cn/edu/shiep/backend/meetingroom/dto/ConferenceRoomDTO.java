@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class ConferenceRoomDTO {
-    private Integer roomId;
+    private Long roomId;
     private String name;
     private int capacity;
     private RoomStatus status;

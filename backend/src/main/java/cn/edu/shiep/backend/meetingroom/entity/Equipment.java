@@ -17,7 +17,7 @@ import java.util.Set;
 public class Equipment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer equipmentId;
+    private Long equipmentId;
 
     @Column(name = "device_name", nullable = false)
     private String deviceName;

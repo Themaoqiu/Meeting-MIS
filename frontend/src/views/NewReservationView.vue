@@ -33,6 +33,7 @@ onMounted(async () => {
     }
   } catch (error) {
     toast.error('获取会议室列表失败')
+    console.error('获取会议室列表失败')
   }
 })
 

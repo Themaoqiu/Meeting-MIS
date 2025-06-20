@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +59,7 @@ public class ReservationService {
         return toResponseDTO(savedReservation);
     }
 
-    public List<ReservationResponse> getMyReservations(Integer userId) {
+    public List<ReservationResponse> getMyReservations(Long userId) {
         return reservationRepository.findById(userId).stream()
                 .map(this::toResponseDTO).collect(Collectors.toList());
     }
@@ -71,12 +72,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public void cancelReservation(Integer reservationId, Integer userId) {
+    public void cancelReservation(Long reservationId, Long userId) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RuntimeException("预约记录未找到, ID: " + reservationId));
         // 现在只有本人能取消
         // TODO：判断isadmin()使得管理员也能取消
-        if(reservation.getUser().getUserId() != userId){
+        if(!Objects.equals(reservation.getUser().getUserId(), userId)){
             throw new RuntimeException("权限不足，您无法取消不属于您的预约");
         }
         if(reservation.getStatus() != ReservationStatus.CONFIRMED){

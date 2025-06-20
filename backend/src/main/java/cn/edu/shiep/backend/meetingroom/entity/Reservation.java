@@ -21,7 +21,7 @@ import java.util.Set;
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer reservationId;
+    private Long reservationId;
 
     @Column(nullable = false)
     private String theme;

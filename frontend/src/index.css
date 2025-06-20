@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+/* @import "tw-animate-css"; */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -120,4 +120,28 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+@layer components {
+  /* 应用到所有 toast 的通用样式 */
+  .custom-toast-class {
+    @apply border-2 border-dashed border-indigo-400; /* 举例：给所有toast加一个紫色的虚线边框 */
+  }
+
+  /* 只应用到成功 toast 的样式 */
+  .success-toast {
+    @apply bg-green-50 border-green-500 text-green-700; /* 举例：淡绿色背景，深绿色边框和文字 */
+  }
+
+  /* 只应用到错误 toast 的样式 */
+  .error-toast {
+    @apply bg-red-50 border-red-500 text-red-700; /* 举例：淡红色背景，深红色边框和文字 */
+  }
+}
+.toaster[data-x-position="right"][data-y-position="top"] {
+  position: fixed;
+  top: var(--offset-top, 24px);
+  right: var(--offset-right, 24px);
+  z-index: 9999;
+  width: var(--width, 356px);
+  gap: var(--gap, 14px);
 }

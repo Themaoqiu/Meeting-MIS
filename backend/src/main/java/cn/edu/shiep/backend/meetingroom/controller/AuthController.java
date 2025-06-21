@@ -5,7 +5,6 @@ import cn.edu.shiep.backend.meetingroom.dto.request.LoginRequest;
 import cn.edu.shiep.backend.meetingroom.dto.request.SignupRequest;
 import cn.edu.shiep.backend.meetingroom.service.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +32,7 @@ public class AuthController {
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         try {
             UserDTO userDTO = authService.login(loginRequest, request);
+            System.out.println("登录成功");
             return ResponseEntity.ok(userDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -46,8 +46,8 @@ public class AuthController {
     }
 
     @GetMapping("/status")
-    public ResponseEntity<?> checkLoginStatus(HttpSession session) {
-        UserDTO userDTO = authService.checkStatus(session);
+    public ResponseEntity<?> checkLoginStatus() {
+        UserDTO userDTO = authService.checkStatus();
         if (userDTO != null) {
             return ResponseEntity.ok(userDTO);
         }

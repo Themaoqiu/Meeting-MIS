@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 @Getter
 @Setter
 public class UserDetailsImpl implements UserDetails {
@@ -39,7 +38,7 @@ public class UserDetailsImpl implements UserDetails {
 
     public static UserDetailsImpl build(User user) {
         // 用户role属性->GrantedAuthority 对象->列表
-        GrantedAuthority authority = new SimpleGrantedAuthority(user.getRole().getName().name());
+        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().getName().name());
         List<GrantedAuthority> authorities = Collections.singletonList(authority);
 
         // 转换为Spring Security 需要的 UserDetailsImpl 对象

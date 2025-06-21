@@ -3,6 +3,7 @@ package cn.edu.shiep.backend.meetingroom.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -12,16 +13,23 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
 import java.util.List;
 
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
+}
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -43,15 +51,14 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                )
+                ).exceptionHandling(exceptions ->
+                exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll() // 登录注册等接口允许匿名访问
-
-                        // 【新增规则】查询会议室、预约、设备等需要至少有 'USER' 角色
-                        .requestMatchers("/api/rooms/**", "/api/reservations/**", "/api/equipment/**", "/api/dashboard/**").hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
-
-                        // 【修改规则】其他所有请求都需要认证 (作为保底)
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/rooms/**", "/api/reservations/**", "/api/equipment/**", "/api/dashboard/**")
+                        .hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
+                        // .permitAll()
                         .anyRequest().authenticated()
                 );
 

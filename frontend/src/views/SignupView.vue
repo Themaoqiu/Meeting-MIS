@@ -25,9 +25,7 @@ const handleSignup = async () => {
     });
     toast.success({ title: '注册成功', description: '请使用您的新账户登录。' });
   } catch (error) {
-    toast.error('注册失败', {
-  description: error.response?.data || '请检查您输入的信息。',
-});
+    toast.error('注册失败', {description: error.response?.data || '请检查您输入的信息'});
   }
 };
 </script>

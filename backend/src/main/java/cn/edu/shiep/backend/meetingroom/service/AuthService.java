@@ -8,11 +8,18 @@ import cn.edu.shiep.backend.meetingroom.entity.User;
 import cn.edu.shiep.backend.meetingroom.enums.ERole;
 import cn.edu.shiep.backend.meetingroom.repository.RoleRepository;
 import cn.edu.shiep.backend.meetingroom.repository.UserRepository;
+import cn.edu.shiep.backend.meetingroom.security.services.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
 import java.util.Set;
 
@@ -27,6 +34,9 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
     public void register(SignupRequest signupRequest) {
@@ -47,15 +57,22 @@ public class AuthService {
     }
 
     public UserDTO login(LoginRequest loginRequest, HttpServletRequest request) {
-        User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(() -> new RuntimeException("错误: 用户不存在。"));
+        // 使用 AuthenticationManager 进行认证
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
 
-        // 验证密码
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("错误: 密码无效。");
-        }
+        // 将认证信息设置到 SecurityContext 中，Spring Security 会自动将其保存到 HttpSession
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        
+        // request.getSession(true) 确保了 Session 被创建
+        request.getSession(true).setAttribute("SPRING_SECURITY_CONTEXT", context);
 
-        HttpSession session = request.getSession(true);
-        session.setAttribute("userId", user.getUserId());
+
+        // 从认证信息中获取 UserDetails
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        User user = userRepository.findById(userDetails.getId()).orElseThrow(() -> new RuntimeException("错误: 用户不存在。"));
 
         return convertToUserDTO(user);
     }
@@ -67,13 +84,16 @@ public class AuthService {
         }
     }
 
-    public UserDTO checkStatus(HttpSession session) {
-        // 会话中获取userid转换成int，如果为null说明没登录
-        Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
+    public UserDTO checkStatus() {
+        // 直接从 SecurityContextHolder 获取认证信息
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
             return null;
         }
-        return userRepository.findById(Long.valueOf(userId)).map(this::convertToUserDTO).orElse(null);
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        return userRepository.findById(userDetails.getId()).map(this::convertToUserDTO).orElse(null);
     }
 
     private UserDTO convertToUserDTO(User user) {

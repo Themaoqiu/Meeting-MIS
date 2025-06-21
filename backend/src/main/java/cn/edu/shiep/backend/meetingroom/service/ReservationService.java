@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -23,12 +22,16 @@ import java.util.stream.Collectors;
 public class ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
+
     @Autowired
     private ConferenceRoomRepository conferenceRoomRepository;
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private NoticeService noticeService;
+    
     // 新建预约
     @Transactional
     public ReservationResponse createReservation(ReservationRequest requestDTO, Long userId){

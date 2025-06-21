@@ -17,6 +17,7 @@ import java.util.List;
 public class ConferenceRoomController {
     @Autowired
     private ConferenceRoomService conferenceRoomService;
+    
     @GetMapping
     public ResponseEntity<List<ConferenceRoomDTO>> getAllRooms() {
         return ResponseEntity.ok(conferenceRoomService.getAllRoomsWithEquipment());

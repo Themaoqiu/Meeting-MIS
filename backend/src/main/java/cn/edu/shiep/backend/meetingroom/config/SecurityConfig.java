@@ -47,20 +47,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                ).exceptionHandling(exceptions ->
-                exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/rooms/**", "/api/reservations/**", "/api/equipment/**", "/api/dashboard/**")
-                        .hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
-                        // .permitAll()
-                        .anyRequest().authenticated()
-                );
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+        ).exceptionHandling(exceptions ->
+        exceptions.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+        .authorizeHttpRequests(authz -> authz
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                // 登录
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // 普通用户
+                .requestMatchers("/api/rooms/available", "/api/reservations/my", "/api/dashboard/stats").hasRole("USER")
+
+                // 会议室管理
+                .requestMatchers("/api/admin/rooms/**", "/api/admin/statistics/**").hasRole("ROOM_ADMIN")
+
+                // 系统管理
+                .requestMatchers("/api/admin/users/**", "/api/admin/settings/**", "/api/admin/logs/**").hasRole("SYSTEM_ADMIN")
+
+                // 通用
+                .requestMatchers(HttpMethod.POST, "/api/reservations").hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/rooms").hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
+
+                .anyRequest().authenticated()
+        );
+
 
         return http.build();
     }

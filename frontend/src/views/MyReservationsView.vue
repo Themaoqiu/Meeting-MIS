@@ -6,7 +6,16 @@ import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
-const myReservations = ref([])
+export interface Reservation {
+  reservationId: number
+  theme: string
+  roomName: string
+  startTime: string
+  endTime: string
+  status: 'CONFIRMED' | 'CANCELLED' | 'PENDING' | 'COMPLETED'
+}
+
+const myReservations = ref<Reservation[]>([])
 
 const fetchReservations = async () => {
   try {
@@ -26,9 +35,7 @@ const handleCancel = async (id: number) => {
     // 刷新列表
     fetchReservations()
   } catch (error: any) {
-    toast.error('取消失败', {
-      description: error.response?.data
-    })
+    toast.error('取消失败', {description: error.response?.data})
   }
 }
 

@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import apiClient from '@/services/api';
+import router from '@/router';
 
 // 用户数据类型
 interface User {
@@ -9,46 +10,56 @@ interface User {
   name: string;
   email: string;
   phone: string;
-  roles: string[];
+  roles: Set<string>;
 }
 
-export const useAuthStore = defineStore('auth', () => {
-  const router = useRouter();
-  const user = ref<User | null>(null);
-
-  const isLoggedIn = computed(() => !!user.value);
-
-  // 登录
-  async function login(credentials: any) {
-    await apiClient.post('/auth/login', credentials);
-    // 登录成功后，获取用户状态
-    await checkAuthStatus();
-    router.push('/dashboard');
-  }
-
-  // 注册
-  async function signup(userInfo: any) {
-    await apiClient.post('/auth/signup', userInfo);
-    // 注册成功后可以跳转到登录页
-    router.push('/login');
-  }
-
-  // 登出
-  async function logout() {
-    await apiClient.post('/auth/logout');
-    user.value = null;
-    router.push('/login');
-  }
-
-  // 检查登录状态
-  async function checkAuthStatus() {
-    try {
-      const response = await apiClient.get<User>('/auth/status');
-      user.value = response.data;
-    } catch (error) {
-      user.value = null;
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: null as User | null,
+    isLoggedIn: false,
+  }),
+  getters: {
+    // 提供一个getter，方便在组件中检查用户是否拥有特定角色
+    hasRole: (state) => (role: string): boolean => {
+      return state.user?.roles.has(role) ?? false;
+    },
+  },
+  actions: {
+    // 登录时，后端会返回包含角色信息的用户对象
+    async login(credentials: any) {
+      const response = await apiClient.post('/auth/login', credentials);
+      const userData = response.data;
+      this.user = {
+        ...userData,
+        roles: new Set(userData.roles), // 将后端返回的角色数组转换为Set
+      };
+      this.isLoggedIn = true;
+      router.push('/dashboard');
+    },
+    async  signup(userInfo: any) {
+      await apiClient.post('/auth/signup', userInfo);
+      // 注册成功后可以跳转到登录页
+      router.push('/login');
+    },
+    async logout() {
+      await apiClient.post('/auth/logout');
+      this.user = null;
+      this.isLoggedIn = false;
+      router.push('/login');
+    },
+    async checkAuthStatus() {
+        try {
+            const response = await apiClient.get('/auth/status');
+            const userData = response.data;
+            this.user = {
+                ...userData,
+                roles: new Set(userData.roles),
+            };
+            this.isLoggedIn = true;
+        } catch (error) {
+            this.user = null;
+            this.isLoggedIn = false;
+        }
     }
-  }
-
-  return { user, isLoggedIn, login, signup, logout, checkAuthStatus };
+  },
 });

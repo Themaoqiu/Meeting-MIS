@@ -1,11 +1,43 @@
 <script setup lang="ts">
 import Sidebar from '@/components/Sidebar.vue';
+import { useAuthStore } from '@/stores/auth';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-vue-next';
+import { toast } from 'vue-sonner';
+
+// 获取认证状态 store
+const authStore = useAuthStore();
+
+// 定义退出登录的处理函数
+const handleLogout = async () => {
+  try {
+    await authStore.logout();
+    toast.success('您已成功退出登录');
+  } catch (error) {
+    toast.error('退出登录失败，请稍后重试。');
+  }
+};
 </script>
 
 <template>
   <div class="flex h-screen bg-secondary/30">
     <Sidebar />
+
     <div class="flex-1 flex flex-col overflow-hidden">
+      
+      <header class="flex items-center justify-between p-2 pl-6 border-b bg-background">
+        <div>
+          <span class="text-lg font-semibold">欢迎, {{ authStore.user?.name }}!</span>
+        </div>
+        
+        <div class="flex items-center">
+          <Button variant="ghost" @click="handleLogout">
+            <LogOut class="mr-2 h-4 w-4" />
+            退出登录
+          </Button>
+        </div>
+      </header>
+
       <main class="flex-1 p-6 overflow-auto">
         <router-view v-slot="{ Component, route }">
           <transition
@@ -28,7 +60,7 @@ import Sidebar from '@/components/Sidebar.vue';
 </template>
 
 <style scoped>
-/* 定义动画效果 */
+/* 动画效果保持不变 */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

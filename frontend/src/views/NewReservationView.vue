@@ -27,13 +27,8 @@ onMounted(async () => {
   try {
     const response = await getAllRooms()
     rooms.value = response.data
-    // 如果URL参数中带了roomId，则自动选中
-    if (route.query.roomId) {
-      reservation.value.roomId = route.query.roomId
-    }
   } catch (error) {
     toast.error('获取会议室列表失败')
-    console.error('获取会议室列表失败')
   }
 })
 
@@ -50,9 +45,7 @@ const handleSubmit = async () => {
     toast.success('预约成功！')
     router.push('/reservations/my')
   } catch (error: any) {
-    toast.error('预约失败', {
-      description: error.response?.data || '请检查您的输入信息。'
-    })
+    toast.error('预约失败', {description: error.response?.data || '请检查您的输入信息。'})
   }
 }
 </script>

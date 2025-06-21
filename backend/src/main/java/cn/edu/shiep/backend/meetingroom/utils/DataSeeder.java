@@ -17,7 +17,7 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         seedRoles();
     }
-
+    // 填充用户表中的角色
     private void seedRoles() {
         if (roleRepository.findByName(ERole.USER).isEmpty()) {
             Roles userRole = new Roles();

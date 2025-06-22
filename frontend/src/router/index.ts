@@ -75,7 +75,7 @@ const router = createRouter({
 });
 
 // 全局前置守卫
-router.beforeEach(async (to, from, next) => { 
+router.beforeEach(async (to, _from, next) => { 
   const authStore = useAuthStore(); //
   
   // 在首次加载或刷新时检查认证状态

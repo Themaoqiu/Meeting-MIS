@@ -54,19 +54,19 @@ const authStore = useAuthStore();
       <div v-if="authStore.hasRole('ROOM_ADMIN') || authStore.hasRole('SYSTEM_ADMIN')" class="pt-4">
         <h3 class="text-sm font-semibold text-muted-foreground px-4 mb-1">会议室管理</h3>
         <Button variant="ghost" class="justify-start" as-child>
-          <RouterLink to="/admin/dashboard" active-class="bg-accent text-accent-foreground">
+          <RouterLink to="/admin/dashboard" active-class="bg-accent text-accent-foreground" class="flex items-center w-full">
             <BarChart class="mr-2 h-4 w-4" />
             状态看板
           </RouterLink>
         </Button>
         <Button variant="ghost" class="justify-start" as-child>
-          <RouterLink to="/admin/manage-rooms" active-class="bg-accent text-accent-foreground">
+          <RouterLink to="/admin/manage-rooms" active-class="bg-accent text-accent-foreground" class="flex items-center w-full">
             <Settings class="mr-2 h-4 w-4" />
             会议室设置
           </RouterLink>
         </Button>
         <Button variant="ghost" class="justify-start" as-child>
-          <RouterLink to="/admin/statistics" active-class="bg-accent text-accent-foreground">
+          <RouterLink to="/admin/statistics" active-class="bg-accent text-accent-foreground" class="flex items-center w-full">
             <BarChart class="mr-2 h-4 w-4" />
             使用统计
           </RouterLink>
@@ -76,7 +76,7 @@ const authStore = useAuthStore();
       <div v-if="authStore.hasRole('SYSTEM_ADMIN')" class="pt-4">
         <h3 class="text-sm font-semibold text-muted-foreground px-4 mb-1">系统管理</h3>
         <Button variant="ghost" class="justify-start" as-child>
-          <RouterLink to="/admin/manage-users" active-class="bg-accent text-accent-foreground">
+          <RouterLink to="/admin/manage-users" active-class="bg-accent text-accent-foreground" class="flex items-center w-full">
             <Users class="mr-2 h-4 w-4" />
             用户管理
           </RouterLink>

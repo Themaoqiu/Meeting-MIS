@@ -1,6 +1,4 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
 import apiClient from '@/services/api';
 import router from '@/router';
 

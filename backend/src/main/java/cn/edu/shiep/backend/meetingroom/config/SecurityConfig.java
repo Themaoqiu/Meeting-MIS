@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
 
                 // 普通用户
-                .requestMatchers("/api/rooms/available", "/api/reservations/my", "/api/dashboard/stats").hasRole("USER")
+                .requestMatchers("/api/rooms/available", "/api/reservations/my", "/api/dashboard/stats").hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
 
                 // 会议室管理
                 .requestMatchers("/api/admin/rooms/**", "/api/admin/statistics/**").hasRole("ROOM_ADMIN")

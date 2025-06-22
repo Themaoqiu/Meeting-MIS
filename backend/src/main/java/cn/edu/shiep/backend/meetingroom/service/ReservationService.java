@@ -63,7 +63,7 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> getMyReservations(Long userId) {
-        return reservationRepository.findById(userId).stream()
+        return reservationRepository.findByUser_UserId(userId).stream()
                 .map(this::toResponseDTO).collect(Collectors.toList());
     }
 

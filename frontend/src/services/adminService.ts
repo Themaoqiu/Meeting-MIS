@@ -21,6 +21,10 @@ export const updateRoom = (roomId: number, roomData: any) => {
   return apiClient.put(`/admin/rooms/${roomId}`, roomData);
 };
 
+export const deleteRoom = (roomId: number) => {
+  return apiClient.delete(`/admin/rooms/${roomId}`);
+}
+
 // 系统管理员
 // 获取系统中的所有用户列表
 export const getAllUsers = () => {
@@ -29,9 +33,10 @@ export const getAllUsers = () => {
 
 // 更新用户的角色
 export const updateUserRole = (userId: number, role: string) => {
-    // 后端需要纯文本格式，所以设置Content-Type
-    return apiClient.put(`/admin/users/${userId}/role`, role, {
-        headers: { 'Content-Type': 'text/plain' }
+    return apiClient.put(`/admin/users/${userId}/role`, JSON.stringify(role),{
+      headers: {
+        'Content-Type': 'application/json' // 明确告知后端这是JSON数据
+      }
     });
 };
 

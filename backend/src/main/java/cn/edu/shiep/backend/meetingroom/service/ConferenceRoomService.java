@@ -57,6 +57,7 @@ public class ConferenceRoomService {
         room.setName(dto.getName());
         room.setCapacity(dto.getCapacity());
         room.setRoomStatus(dto.getStatus());
+        
         if(dto.getEquipments() != null){
             List<Equipment> equipmentList = new ArrayList<>();
             for(EquipmentDTO equipDTO : dto.getEquipments()){
@@ -67,8 +68,11 @@ public class ConferenceRoomService {
                 equipment.setConferenceRoom(room);
                 equipmentList.add(equipment);
             }
+            room.setEquipments(equipmentList); 
         }
-        return toConferenceRoomDTO(conferenceRoomRepository.save(room));
+        
+        ConferenceRoom savedRoom = conferenceRoomRepository.save(room);
+        return toConferenceRoomDTO(savedRoom);
     }
 
     @Transactional
@@ -115,5 +119,18 @@ public class ConferenceRoomService {
                     .currentBookingTheme(theme)
                     .build();
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteRoom(Long roomId) {
+        if (!conferenceRoomRepository.existsById(roomId)) {
+            throw new RuntimeException("会议室不存在, ID: " + roomId);
+        }
+        // 检查是否有未来的预约
+        long upcomingReservations = reservationRepository.countByConferenceRoom_RoomIdAndEndTimeAfter(roomId, LocalDateTime.now());
+        if (upcomingReservations > 0) {
+            throw new RuntimeException("无法删除！该会议室尚有未完成的预约。");
+        }
+        conferenceRoomRepository.deleteById(roomId);
     }
 }

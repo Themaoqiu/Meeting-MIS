@@ -76,7 +76,7 @@ const authStore = useAuthStore();
       <template v-if="authStore.hasRole('SYSTEM_ADMIN')" class="mt-4">
         <h3 class="text-sm font-semibold text-muted-foreground px-4 mb-1">系统管理</h3>
         <Button variant="ghost" class="justify-start" as-child>
-          <RouterLink to="/admin/manage-users" active-class="bg-accent text-accent-foreground">
+          <RouterLink to="/admin/users" active-class="bg-accent text-accent-foreground">
             <Users class="mr-2 h-4 w-4" />
             用户管理
           </RouterLink>

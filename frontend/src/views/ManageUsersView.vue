@@ -15,7 +15,7 @@ const fetchUsers = async () => {
   try {
     const response = await getAllUsers();
     // 假设每个用户只有一个角色，简化处理
-    users.value = response.data.map(u => ({...u, roles: u.roles[0] }));
+    users.value = response.data.map((u: { roles: any[]; }) => ({...u, roles: u.roles[0] }));
   } catch (error) {
     toast.error('获取用户列表失败');
   } finally {
@@ -25,8 +25,11 @@ const fetchUsers = async () => {
 
 onMounted(fetchUsers);
 
-const handleRoleChange = async (userId, newRole) => {
+const handleRoleChange = async (userId: number, newRole: string) => {
   try {
+    console.log(`准备为用户ID ${userId} 更新角色为:`, newRole);
+    console.log('收到的 newRole 的类型是:', typeof newRole);
+    console.log(`[调试信息] 用户ID: ${userId}, 准备更新的角色值:`, newRole);
     await updateUserRole(userId, newRole);
     toast.success('用户角色更新成功！');
     await fetchUsers(); // 刷新列表
@@ -35,7 +38,7 @@ const handleRoleChange = async (userId, newRole) => {
   }
 };
 
-const handleDeleteUser = async (userId) => {
+const handleDeleteUser = async (userId: number) => {
     if(confirm('确定要删除该用户吗？此操作不可逆！')) {
         try {
             await deleteUser(userId);

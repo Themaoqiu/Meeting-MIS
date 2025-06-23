@@ -19,3 +19,10 @@ export const createReservation = (data: any) => {
 export const cancelReservation = (id: number) => {
   return apiClient.delete(`/reservations/${id}`);
 };
+
+// 根据时段获取预约列表
+export const getReservationsByRange = (start: String, end: String) => {
+  return  apiClient.get('/reservations/range', {
+    params: {start, end},
+  });
+};

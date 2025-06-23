@@ -102,5 +102,9 @@ public class ReservationService {
                 .userEmail(reservation.getUser().getEmail())
                 .build();
     }
+
+    public List<Reservation> getReservationsByDayRange(LocalDateTime start, LocalDateTime end) {
+        return reservationRepository.findByStartTimeBetween(start, end);
+    }
 }
 

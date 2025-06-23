@@ -1,53 +1,59 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { toast } from 'vue-sonner'
-import { createReservation } from '@/services/reservationService'
-import { getAllRooms } from '@/services/roomService'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { onMounted, ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { toast } from 'vue-sonner';
+import { createReservation } from '@/services/reservationService';
+import { getAllRooms } from '@/services/roomService';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox'; 
 
-const router = useRouter()
-const route = useRoute()
+const router = useRouter();
 
-const rooms = ref([])
+const rooms = ref<any[]>([]);
 const reservation = ref({
   roomId: '',
   theme: '',
   personNum: 1,
   startTime: '',
-  endTime: ''
-})
+  endTime: '',
+  equipmentIds: [] as number[],
+});
+
+// Get available equipment for the selected room
+const availableEquipment = computed(() => {
+  if (!reservation.value.roomId) return [];
+  const selectedRoom = rooms.value.find(r => r.roomId === Number(reservation.value.roomId));
+  return selectedRoom ? selectedRoom.equipments.filter(e => e.status === 'AVAILABLE') : [];
+});
 
 onMounted(async () => {
-  // 获取所有会议室以填充下拉列表
   try {
-    const response = await getAllRooms()
-    rooms.value = response.data
+    const response = await getAllRooms();
+    rooms.value = response.data;
   } catch (error) {
-    toast.error('获取会议室列表失败')
+    toast.error('获取会议室列表失败');
   }
-})
+});
 
 const handleSubmit = async () => {
   try {
     await createReservation({
       ...reservation.value,
-      // 将字符串转换为数字和正确的日期时间格式
-      roomId: Number(reservation.value.roomId),
-      personNum: Number(reservation.value.personNum),
-      startTime: new Date(reservation.value.startTime).toISOString(),
-      endTime: new Date(reservation.value.endTime).toISOString()
-    })
-    toast.success('预约成功！')
-    router.push('/reservations/my')
+      roomId: reservation.value.roomId,
+      personNum: reservation.value.personNum,
+      startTime: reservation.value.startTime,
+      endTime: reservation.value.endTime,
+    });
+    toast.success('预约成功！');
+    router.push('/reservations/my');
   } catch (error: any) {
-    toast.error('预约失败', {description: error.response?.data || '请检查您的输入信息。'})
+    toast.error('预约失败', { description: error.response?.data || '请检查您的输入信息。' });
   }
-}
+};
 </script>
 
 <template>
@@ -72,6 +78,17 @@ const handleSubmit = async () => {
             </SelectContent>
           </Select>
         </div>
+
+        <div v-if="availableEquipment.length > 0" class="space-y-2">
+            <Label>所需设备</Label>
+            <div class="flex flex-wrap gap-4">
+                <div v-for="equip in availableEquipment" :key="equip.equipmentId" class="flex items-center gap-2">
+                    <Checkbox :id="`equip-${equip.equipmentId}`" :value="equip.equipmentId" v-model="reservation.equipmentIds" />
+                    <Label :for="`equip-${equip.equipmentId}`">{{ equip.deviceName }}</Label>
+                </div>
+            </div>
+        </div>
+        
         <div class="space-y-2">
           <Label for="theme">会议主题</Label>
           <Input id="theme" v-model="reservation.theme" required />

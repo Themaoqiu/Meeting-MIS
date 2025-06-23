@@ -33,9 +33,9 @@ export const getAllUsers = () => {
 
 // 更新用户的角色
 export const updateUserRole = (userId: number, role: string) => {
-    return apiClient.put(`/admin/users/${userId}/role`, JSON.stringify(role),{
+    return apiClient.put(`/admin/users/${userId}/role`, role,{
       headers: {
-        'Content-Type': 'application/json' // 明确告知后端这是JSON数据
+        'Content-Type': 'text/plain' 
       }
     });
 };

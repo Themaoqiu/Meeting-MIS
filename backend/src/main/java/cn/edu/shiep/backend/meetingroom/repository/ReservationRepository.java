@@ -60,6 +60,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
 
     long countByConferenceRoom_RoomIdAndEndTimeAfter(Long roomId, LocalDateTime now); 
-    
-    
+
+    List<Reservation> findByConferenceRoom_RoomIdAndStartTimeBetween(Long roomId, LocalDateTime start, LocalDateTime end);
 }

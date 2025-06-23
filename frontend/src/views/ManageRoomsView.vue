@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { getAllRooms } from '@/services/roomService';
-import { createRoom, updateRoom, deleteRoom } from '@/services/adminService'; // 引入 deleteRoom
+import { createRoom, updateRoom, deleteRoom } from '@/services/adminService';
 import { toast } from 'vue-sonner';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import {
-  Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose
-} from '@/components/ui/dialog';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogClose, DialogTrigger} from '@/components/ui/dialog';
+import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -27,10 +23,28 @@ const equipmentTypes = ['PROJECTOR', 'WHITEBOARD', 'VIDEO_CONFERENCE', 'MICROPHO
 const equipmentStatuses = ['AVAILABLE', 'FAULTY', 'MAINTENANCE'];
 const roomStatuses = ['AVAILABLE', 'MAINTENANCE'];
 
+const equipmentTypeMap: Record<string, string> = {
+  'PROJECTOR': '投影仪',
+  'WHITEBOARD': '白板',
+  'VIDEO_CONFERENCE': '视频会议系统',
+  'MICROPHONE': '麦克风'
+};
+const equipmentStatusMap: Record<string, string> = {
+  'AVAILABLE': '可用',
+  'FAULTY': '故障',
+  'MAINTENANCE': '维修中'
+};
+const roomStatusMap: Record<string, string> = {
+  'AVAILABLE': '可用',
+  'MAINTENANCE': '维修中'
+};
+
+
 const fetchRooms = async () => {
   isLoading.value = true;
   try {
-    rooms.value = (await getAllRooms()).data;
+    const response = await getAllRooms();
+    rooms.value = response.data;
   } catch (error) {
     toast.error('获取会议室列表失败');
   } finally {
@@ -87,6 +101,9 @@ const handleDelete = async () => {
 };
 
 const addEquipment = () => {
+  if (!currentRoom.value.equipments) {
+      currentRoom.value.equipments = [];
+  }
   currentRoom.value.equipments.push({ deviceName: '', type: 'PROJECTOR', status: 'AVAILABLE' });
 };
 
@@ -100,7 +117,67 @@ const removeEquipment = (index: number) => {
   <div>
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">会议室设置</h1>
-      <Button @click="openCreateDialog"><PlusCircle class="mr-2 h-4 w-4" />新增会议室</Button>
+       <Dialog v-model:open="isDialogOpen">
+        <DialogTrigger as-child>
+          <Button @click="openCreateDialog"><PlusCircle class="mr-2 h-4 w-4" />新增会议室</Button>
+        </DialogTrigger>
+        <DialogContent class="sm:max-w-[600px]">
+          <DialogHeader><DialogTitle>{{ isEditing ? '编辑会议室' : '新增会议室' }}</DialogTitle></DialogHeader>
+          <div class="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
+            
+            <div class="space-y-2">
+              <Label>名称</Label>
+              <Input v-model="currentRoom.name" />
+            </div>
+
+            <div class="space-y-2">
+              <Label>容量</Label>
+              <Input v-model="currentRoom.capacity" type="number" />
+            </div>
+            
+            <div class="space-y-2">
+              <Label>状态</Label>
+              <Select v-model="currentRoom.status">
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="s in roomStatuses" :key="s" :value="s">
+                    {{ roomStatusMap[s] }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div class="space-y-4 pt-4 border-t">
+              <h4 class="font-bold">设备管理</h4>
+              <div v-for="(equip, index) in currentRoom.equipments" :key="index" class="flex gap-2 items-center">
+                <Input v-model="equip.deviceName" placeholder="设备名" class="flex-1" />
+                <Select v-model="equip.type">
+                  <SelectTrigger class="w-[180px]"><SelectValue/></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem v-for="t in equipmentTypes" :key="t" :value="t">
+                      {{ equipmentTypeMap[t] }}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select v-model="equip.status">
+                    <SelectTrigger class="w-[120px]"><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem v-for="s in equipmentStatuses" :key="s" :value="s">
+                        {{ equipmentStatusMap[s] }}
+                      </SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button variant="ghost" size="icon" @click="removeEquipment(index)"><Trash2 class="h-4 w-4 text-red-500" /></Button>
+              </div>
+              <Button variant="outline" size="sm" @click="addEquipment" class="mt-2">添加设备</Button>
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose as-child><Button variant="outline">取消</Button></DialogClose>
+            <Button @click="handleSave">保存</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
 
     <div class="border rounded-lg">
@@ -109,7 +186,8 @@ const removeEquipment = (index: number) => {
           <TableRow>
             <TableHead>名称</TableHead>
             <TableHead>容量</TableHead>
-            <TableHead>状态</TableHead> <TableHead>设备数量</TableHead>
+            <TableHead>状态</TableHead>
+            <TableHead>设备数量</TableHead>
             <TableHead class="text-right">操作</TableHead>
           </TableRow>
         </TableHeader>
@@ -118,7 +196,8 @@ const removeEquipment = (index: number) => {
           <TableRow v-else v-for="room in rooms" :key="room.roomId">
             <TableCell class="font-medium">{{ room.name }}</TableCell>
             <TableCell>{{ room.capacity }}</TableCell>
-            <TableCell>{{ room.status }}</TableCell> <TableCell>{{ room.equipments.length }}</TableCell>
+            <TableCell>{{ roomStatusMap[room.status] || room.status }}</TableCell>
+            <TableCell>{{ room.equipments.length }}</TableCell>
             <TableCell class="text-right space-x-2">
               <Button variant="outline" size="sm" @click="openEditDialog(room)">编辑</Button>
               <AlertDialog>
@@ -143,40 +222,5 @@ const removeEquipment = (index: number) => {
         </TableBody>
       </Table>
     </div>
-
-    <Dialog v-model:open="isDialogOpen">
-        <DialogContent class="sm:max-w-[600px]">
-          <DialogHeader><DialogTitle>{{ isEditing ? '编辑会议室' : '新增会议室' }}</DialogTitle></DialogHeader>
-          <div class="grid gap-4 py-4 max-h-[70vh] overflow-y-auto pr-4">
-            <div class="grid grid-cols-4 items-center gap-4">
-              <Label class="text-right">名称</Label><Input v-model="currentRoom.name" class="col-span-3" />
-            </div>
-            <div class="grid grid-cols-4 items-center gap-4">
-              <Label class="text-right">容量</Label><Input v-model="currentRoom.capacity" type="number" class="col-span-3" />
-            </div>
-            <div class="grid grid-cols-4 items-center gap-4">
-              <Label class="text-right">状态</Label>
-              <Select v-model="currentRoom.status">
-                <SelectTrigger class="col-span-3"><SelectValue /></SelectTrigger>
-                <SelectContent><SelectItem v-for="s in roomStatuses" :key="s" :value="s">{{ s }}</SelectItem></SelectContent>
-              </Select>
-            </div>
-            <div class="col-span-4 mt-4">
-              <h4 class="font-bold mb-2">设备管理</h4>
-              <div v-for="(equip, index) in currentRoom.equipments" :key="index" class="flex gap-2 mb-2 items-center">
-                 <Input v-model="equip.deviceName" placeholder="设备名" class="flex-1" />
-                 <Select v-model="equip.type"><SelectTrigger class="w-[180px]"><SelectValue/></SelectTrigger><SelectContent><SelectItem v-for="t in equipmentTypes" :key="t" :value="t">{{ t }}</SelectItem></SelectContent></Select>
-                 <Select v-model="equip.status"><SelectTrigger class="w-[150px]"><SelectValue/></SelectTrigger><SelectContent><SelectItem v-for="s in equipmentStatuses" :key="s" :value="s">{{ s }}</SelectItem></SelectContent></Select>
-                 <Button variant="ghost" size="icon" @click="removeEquipment(index)"><Trash2 class="h-4 w-4 text-red-500" /></Button>
-              </div>
-               <Button variant="outline" size="sm" @click="addEquipment" class="mt-2">添加设备</Button>
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose as-child><Button variant="outline">取消</Button></DialogClose>
-            <Button @click="handleSave">保存</Button>
-          </DialogFooter>
-        </DialogContent>
-    </Dialog>
   </div>
 </template>

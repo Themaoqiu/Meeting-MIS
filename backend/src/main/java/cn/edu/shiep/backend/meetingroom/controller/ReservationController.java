@@ -62,9 +62,10 @@ public class ReservationController {
     }
 
     @GetMapping("/range")
-    public ResponseEntity<Object> getReservationsByRange(
+    public ResponseEntity<List<ReservationResponse>> getReservationsByRange(
         @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-        @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
-        return ResponseEntity.ok(reservationService.getReservationsByDayRange(start, end));
+        @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+        @RequestParam(value = "roomId", required = false) Long roomId) {
+        return ResponseEntity.ok(reservationService.getReservationsByDayRange(start, end, roomId));
     }
 }

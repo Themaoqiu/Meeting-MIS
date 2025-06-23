@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-// 直接使用原有的 service 方法
 import { getStatisticsReport } from '@/services/adminService'; 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +14,6 @@ const fetchReport = async () => {
   isLoading.value = true;
   report.value = null;
   try {
-    // 调用未改变的 service 方法
     const response = await getStatisticsReport(selectedDate.value.year, selectedDate.value.month);
     report.value = response.data;
   } catch (error) {

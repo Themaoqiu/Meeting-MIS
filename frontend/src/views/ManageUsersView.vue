@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import { getAllUsers, updateUserRole, deleteUser } from '@/services/adminService';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { toast } from 'vue-sonner';
 import { Trash2 } from 'lucide-vue-next';

@@ -7,9 +7,6 @@ import { useAuthStore } from '@/stores/auth'
 import { ArrowLeft } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
-
-
-const authStore = useAuthStore()
 const rooms = ref([])
 interface Room{
   roomId: string,

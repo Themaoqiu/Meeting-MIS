@@ -10,8 +10,6 @@ import CalendarView from '@/components/CalendarView.vue';
 import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
-
-const authStore = useAuthStore()
 interface RoomStatus {
   roomId: number;
   name: string;

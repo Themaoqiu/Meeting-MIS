@@ -10,6 +10,7 @@ import AdminDashboardView from '@/views/AdminDashboardView.vue';
 import ManageRoomsView from '@/views/ManageRoomsView.vue';
 import StatisticsView from '@/views/StatisticsView.vue';
 import ManageUsersView from '@/views/ManageUsersView.vue';
+import MyCalendarView from '@/views/MyCalendarView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -70,6 +71,12 @@ const router = createRouter({
       name: 'admin-users',
       component: ManageUsersView,
       meta: { requiresAuth: true, roles: ['SYSTEM_ADMIN'] } 
+    },
+    {
+      path: '/calendar',
+      name: 'my-calendar',
+      component: MyCalendarView,
+      meta: { requiresAuth: true }
     },
   ]
 });

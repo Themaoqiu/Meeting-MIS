@@ -4,6 +4,7 @@ import { getAllRooms } from '@/services/roomService'
 import RoomCard from '@/components/RoomCard.vue'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth'
+import { ArrowLeft } from 'lucide-vue-next'
 
 const authStore = useAuthStore()
 
@@ -38,7 +39,12 @@ onMounted(async () => {
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">会议室列表</h1>
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-bold">会议室列表</h1>
+      <button @click="$router.push('/dashboard')" class="p-2 rounded-full hover:bg-gray-200 transition">
+        <ArrowLeft class="w-5 h-5" />
+      </button>
+    </div>
     <div v-if="isLoading">加载中...</div>
     <div v-else class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <RoomCard v-for="room in rooms" :key="room.roomId" :room="room">

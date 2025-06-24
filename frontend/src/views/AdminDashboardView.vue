@@ -7,6 +7,9 @@ import { Circle } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import { useAuthStore } from '@/stores/auth'
 import CalendarView from '@/components/CalendarView.vue'; 
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const authStore = useAuthStore()
 interface RoomStatus {

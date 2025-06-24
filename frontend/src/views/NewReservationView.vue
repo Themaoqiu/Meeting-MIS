@@ -12,7 +12,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import CalendarView from '@/components/CalendarView.vue';
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const router = useRouter();
 const allRooms = ref<any[]>([]);
 const authStore = useAuthStore()

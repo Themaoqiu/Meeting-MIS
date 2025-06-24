@@ -5,6 +5,8 @@ import RoomCard from '@/components/RoomCard.vue'
 import { toast } from 'vue-sonner'
 import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
+
 
 const authStore = useAuthStore()
 const rooms = ref([])

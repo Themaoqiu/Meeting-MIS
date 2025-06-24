@@ -6,6 +6,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Circle } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 import CalendarView from '@/components/CalendarView.vue'; 
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 interface RoomStatus {
   roomId: number;
@@ -20,6 +23,7 @@ const isLoading = ref(true);
 const viewMode = ref<'rooms' | 'month' | 'day'>('rooms');
 
 onMounted(async () => {
+  if (!authStore.isLoggedIn) return
   try {
     const response = await getRoomStatusDashboard();
     rooms.value = response.data;

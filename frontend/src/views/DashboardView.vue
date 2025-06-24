@@ -4,6 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Home, Calendar, UserCheck } from 'lucide-vue-next'
 import apiClient from '@/services/api'
 import { toast } from 'vue-sonner';
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const stats = ref({
   totalRooms: 0,
@@ -14,6 +17,11 @@ const stats = ref({
 const isLoading = ref(true);
 
 onMounted(async () => {
+  await authStore.checkAuthStatus()
+  if (!authStore.isLoggedIn) {
+    isLoading.value = false
+    return
+  }
   try {
     const response = await apiClient.get('/dashboard/stats');
     stats.value = response.data;

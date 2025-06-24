@@ -11,7 +11,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import CalendarView from '@/components/CalendarView.vue';
+import { useAuthStore } from '@/stores/auth'
 
+const authStore = useAuthStore()
 const router = useRouter();
 const allRooms = ref<any[]>([]);
 
@@ -37,6 +39,7 @@ watch(() => reservation.value.roomId, () => {
 });
 
 onMounted(async () => {
+  if (!authStore.isLoggedIn) return
   try {
     const response = await getAllRooms();
     allRooms.value = response.data;

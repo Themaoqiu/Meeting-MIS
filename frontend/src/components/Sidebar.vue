@@ -11,7 +11,8 @@ import {
   CalendarPlus,       // 新建预约
   BarChart,           // 状态看板 & 使用统计
   Settings,           // 会议室设置
-  Users               // 用户管理
+  Users,              // 用户管理
+  CalendarCheck      // 会议日程
 } from 'lucide-vue-next'
 
 const authStore = useAuthStore();
@@ -48,6 +49,13 @@ const authStore = useAuthStore();
         <RouterLink to="/reservations/my" active-class="bg-accent text-accent-foreground">
           <CalendarDays class="mr-2 h-4 w-4" />
           我的预约
+        </RouterLink>
+      </Button>
+
+      <Button variant="ghost" class="justify-start" as-child>
+        <RouterLink to="/calendar" active-class="bg-accent text-accent-foreground">
+          <CalendarCheck class="mr-2 h-4 w-4" />
+          会议日程
         </RouterLink>
       </Button>
 

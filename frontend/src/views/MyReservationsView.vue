@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { getMyReservations, cancelReservation } from '@/services/reservationService'
 import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
@@ -44,6 +44,15 @@ const handleCancel = async (id: number) => {
 
 // 格式化日期和时间
 const formatDateTime = (datetime: string) => new Date(datetime).toLocaleString('zh-CN')
+const sortedReservations = computed(() => {
+  return [...myReservations.value].sort((a, b) => {
+    // 未取消的排前面，已取消的排后面
+    if (a.status !== 'CANCELED' && b.status === 'CANCELED') return -1;
+    if (a.status === 'CANCELED' && b.status !== 'CANCELED') return 1;
+    // 其他按开始时间排序
+    return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+  });
+});
 </script>
 
 <template>
@@ -65,7 +74,7 @@ const formatDateTime = (datetime: string) => new Date(datetime).toLocaleString('
           <TableRow v-if="myReservations.length === 0">
             <TableCell colspan="6" class="text-center text-muted-foreground">您还没有任何预约</TableCell>
           </TableRow>
-          <TableRow v-for="r in myReservations" :key="r.reservationId">
+          <TableRow v-for="r in sortedReservations" :key="r.reservationId">
             <TableCell>{{ r.theme }}</TableCell>
             <TableCell>{{ r.roomName }}</TableCell>
             <TableCell>{{ formatDateTime(r.startTime) }}</TableCell>

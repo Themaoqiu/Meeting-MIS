@@ -4,19 +4,23 @@ import { getReservationsByRange } from '@/services/reservationService';
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { toast } from 'vue-sonner';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth'
 
-// 使用 withDefaults 来设置默认值，让组件更健壮
+const authStore = useAuthStore()
 const props = withDefaults(defineProps<{
   roomId?: number,
-  viewMode?: 'month' | 'day' // viewMode 变为可选
+  viewMode?: 'month' | 'day' 
+  onlyMine?: boolean
 }>(), {
-  viewMode: 'month' // 如果不传入 viewMode，则默认显示“月视图”
+  viewMode: 'month' // 如果不传入 viewMode，则默认显示月视图
 });
 
 const currentDate = ref(new Date());
 const reservations = ref<any[]>([]);
 const isLoading = ref(true);
 const daysOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+const router = useRouter();
 
 const monthDays = computed(() => {
   const year = currentDate.value.getFullYear();
@@ -36,7 +40,13 @@ const monthDays = computed(() => {
 const dayReservations = computed(() => {
   return reservations.value
     .filter(r => new Date(r.startTime).toDateString() === currentDate.value.toDateString())
-    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    .sort((a, b) => {
+      // 未取消的排前面，已取消的排后面
+      if (a.status !== 'CANCELED' && b.status === 'CANCELED') return -1;
+      if (a.status === 'CANCELED' && b.status !== 'CANCELED') return 1;
+      // 其他按开始时间排序
+      return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+    });
 });
 
 const changeDate = (amount: number) => {
@@ -50,6 +60,7 @@ const changeDate = (amount: number) => {
 };
 
 const fetchData = async () => {
+    if (!authStore.isLoggedIn) return
     isLoading.value = true;
     reservations.value = [];
     let start, end;
@@ -65,8 +76,19 @@ const fetchData = async () => {
         end.setHours(23,59,59,999);
     }
     try {
-        const response = await getReservationsByRange(start.toISOString(), end.toISOString(), props.roomId);
-        reservations.value = response.data;
+      let response;
+        if (props.onlyMine) {
+          // 获取当前用户的预约，前端过滤时间范围
+          response = await import('@/services/reservationService').then(m => m.getMyReservations());
+          reservations.value = response.data.filter((r: any) => {
+            const st = new Date(r.startTime).getTime();
+            const et = new Date(r.endTime).getTime();
+            return st <= end.getTime() && et >= start.getTime();
+          });
+        } else {
+          response = await getReservationsByRange(start.toISOString(), end.toISOString(), props.roomId);
+          reservations.value = response.data;
+        }
     } catch {
         toast.error("获取会议室日程失败");
     } finally {
@@ -78,7 +100,15 @@ watch([currentDate, () => props.roomId, () => props.viewMode], fetchData, { imme
 
 const getReservationsForDay = (day: Date | null) => {
     if (!day) return [];
-    return reservations.value.filter(r => new Date(r.startTime).toDateString() === day.toDateString());
+    return reservations.value
+      .filter(r => new Date(r.startTime).toDateString() === day.toDateString())
+      .sort((a, b) => {
+        // 未取消的排前面，已取消的排后面
+        if (a.status !== 'CANCELED' && b.status === 'CANCELED') return -1;
+        if (a.status === 'CANCELED' && b.status !== 'CANCELED') return 1;
+        // 其他按开始时间排序
+        return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+      });
 }
 </script>
 
@@ -103,7 +133,10 @@ const getReservationsForDay = (day: Date | null) => {
         <span v-if="day" class="font-semibold text-sm">{{ day.getDate() }}</span>
         <div v-if="day" class="mt-1 space-y-1 text-xs overflow-y-auto">
           <div v-for="res in getReservationsForDay(day)" :key="res.reservationId"
-               class="bg-primary/10 p-1 rounded text-[10px] leading-tight">
+            :class="[
+                'p-1 rounded text-[10px] leading-tight',
+                res.status === 'CANCELED' ? 'bg-gray-200 text-gray-500' : 'bg-primary/10'
+              ]">
             <p class="font-bold truncate">{{ res.theme }}</p>
             <p v-if="!roomId" class="text-muted-foreground truncate">{{ res.roomName }}</p>
             <p>{{ new Date(res.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}</p>
@@ -115,7 +148,11 @@ const getReservationsForDay = (day: Date | null) => {
     <div v-else-if="viewMode === 'day'">
       <div v-if="dayReservations.length === 0" class="text-center text-muted-foreground py-8">本日无会议安排</div>
       <div v-else class="space-y-2">
-         <div v-for="res in dayReservations" :key="res.reservationId" class="border p-3 rounded-lg bg-background/50">
+        <div v-for="res in dayReservations" :key="res.reservationId"
+          :class="[
+            'border p-3 rounded-lg',
+            res.status === 'CANCELED' ? 'bg-gray-200 text-gray-500' : 'bg-background/50'
+          ]">
             <h3 class="font-semibold">{{ res.theme }}</h3>
             <p>{{ new Date(res.startTime).toLocaleTimeString('zh-CN') }} - {{ new Date(res.endTime).toLocaleTimeString('zh-CN') }}</p>
             <p class="text-sm text-muted-foreground">会议室: {{ res.roomName }} | 预约人: {{ res.userName }}</p>

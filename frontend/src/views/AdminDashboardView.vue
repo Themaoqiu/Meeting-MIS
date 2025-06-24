@@ -8,6 +8,7 @@ import { toast } from 'vue-sonner';
 import CalendarView from '@/components/CalendarView.vue'; 
 import { useAuthStore } from '@/stores/auth'
 
+
 const authStore = useAuthStore()
 
 interface RoomStatus {

@@ -4,6 +4,9 @@ import { getRoomStatusDashboard } from '@/services/adminService';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Circle } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 interface RoomStatus {
   roomId: number;
@@ -17,6 +20,7 @@ const rooms = ref<RoomStatus[]>([]);
 const isLoading = ref(true);
 
 onMounted(async () => {
+  if (!authStore.isLoggedIn) return
   try {
     const response = await getRoomStatusDashboard();
     rooms.value = response.data;

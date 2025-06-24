@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -94,8 +95,8 @@ public class ReservationService {
                 .reservationId(reservation.getReservationId())
                 .theme(reservation.getTheme())
                 .personNum(reservation.getPersonNum())
-                .startTime(reservation.getStartTime())
-                .endTime(reservation.getEndTime())
+                .startTime(reservation.getStartTime().toInstant(ZoneOffset.UTC))
+                .endTime(reservation.getEndTime().toInstant(ZoneOffset.UTC))
                 .status(reservation.getStatus())
                 .roomName(reservation.getConferenceRoom().getName())
                 .userName(reservation.getUser().getName())

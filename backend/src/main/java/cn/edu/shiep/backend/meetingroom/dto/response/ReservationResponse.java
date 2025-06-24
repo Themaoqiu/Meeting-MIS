@@ -4,15 +4,15 @@ import cn.edu.shiep.backend.meetingroom.enums.ReservationStatus;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 @Data
 @Builder
 public class ReservationResponse {
     private Long reservationId;
     private String theme;
     private int personNum;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private Instant startTime;
+    private Instant endTime;
     private ReservationStatus status;
     private String roomName;
     private String userName;

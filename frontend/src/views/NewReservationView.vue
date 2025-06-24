@@ -9,6 +9,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const router = useRouter()
 const route = useRoute()
@@ -23,6 +26,7 @@ const reservation = ref({
 })
 
 onMounted(async () => {
+  if (!authStore.isLoggedIn) return
   // 获取所有会议室以填充下拉列表
   try {
     const response = await getAllRooms()

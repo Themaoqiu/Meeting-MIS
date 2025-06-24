@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public class ConferenceRoomService {
             RoomStatus status = room.getRoomStatus();
             String theme = null;
             if(status == RoomStatus.AVAILABLE){
-                List<Reservation> activeReservations = reservationRepository.findActiveReservationForRoom(room.getRoomId(), LocalDateTime.now());
+                List<Reservation> activeReservations = reservationRepository.findActiveReservationForRoom(room.getRoomId(), LocalDateTime.now(ZoneOffset.UTC));
 
             if (!activeReservations.isEmpty()) {
                 // If a reservation is active, update the status and get the theme

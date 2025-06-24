@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -33,5 +34,5 @@ public class ConferenceRoom {
     private List<Reservation> reservations;
 
     @OneToMany(mappedBy = "conferenceRoom", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Equipment> equipments;
+    private List<Equipment> equipments = new ArrayList<>();
 }

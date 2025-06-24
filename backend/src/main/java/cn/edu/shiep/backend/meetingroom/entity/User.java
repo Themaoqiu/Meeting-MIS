@@ -34,6 +34,12 @@ public class User {
     @Column(nullable = true)
     private String phone;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Reservation> reservations = new HashSet<>();
+
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<Notice> notices = new HashSet<>();
+
     public User(String userName, String email, String password, String phone) {
         this.email = email;
         this.name = userName;

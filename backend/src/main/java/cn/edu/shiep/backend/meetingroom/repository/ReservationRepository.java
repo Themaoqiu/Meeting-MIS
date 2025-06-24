@@ -1,5 +1,7 @@
 package cn.edu.shiep.backend.meetingroom.repository;
 
+import cn.edu.shiep.backend.meetingroom.dto.UsageReportDTO.RoomUsage;
+import cn.edu.shiep.backend.meetingroom.dto.UsageReportDTO.UserActivity;
 import cn.edu.shiep.backend.meetingroom.entity.Reservation;
 import cn.edu.shiep.backend.meetingroom.enums.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -39,5 +41,25 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
           "FROM Reservation r " +
           "WHERE r.startTime BETWEEN :start AND :end " +
           "AND r.status = cn.edu.shiep.backend.meetingroom.enums.ReservationStatus.CONFIRMED")
-    Double getTotalBookedHours(LocalDateTime start, LocalDateTime end);    
+    Double getTotalBookedHours(LocalDateTime start, LocalDateTime end);
+    
+    
+    @Query("SELECT new cn.edu.shiep.backend.meetingroom.dto.UsageReportDTO$RoomUsage(r.conferenceRoom.name, COUNT(r), COALESCE(SUM(TIMESTAMPDIFF(HOUR, r.startTime, r.endTime)), 0.0)) " +
+           "FROM Reservation r " +
+           "WHERE r.startTime BETWEEN :start AND :end AND r.status = :status " +
+           "GROUP BY r.conferenceRoom.name " +
+           "ORDER BY COUNT(r) DESC")
+    List<RoomUsage> findUsageByRoom(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("status") ReservationStatus confirmed);
+
+    @Query("SELECT new cn.edu.shiep.backend.meetingroom.dto.UsageReportDTO$UserActivity(r.user.name, COUNT(r)) " +
+           "FROM Reservation r " +
+           "WHERE r.startTime BETWEEN :start AND :end AND r.status = :status " +
+           "GROUP BY r.user.name " +
+           "ORDER BY COUNT(r) DESC")
+    List<UserActivity> findUserActivity(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("status") ReservationStatus confirmed);
+
+
+    long countByConferenceRoom_RoomIdAndEndTimeAfter(Long roomId, LocalDateTime now); 
+
+    List<Reservation> findByConferenceRoom_RoomIdAndStartTimeBetween(Long roomId, LocalDateTime start, LocalDateTime end);
 }

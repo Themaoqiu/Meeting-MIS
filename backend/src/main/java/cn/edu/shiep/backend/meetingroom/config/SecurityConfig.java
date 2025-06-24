@@ -59,11 +59,11 @@ public class SecurityConfig {
                 // 登录
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // 普通用户
+                // 基础功能
                 .requestMatchers("/api/rooms/available", "/api/reservations/my", "/api/dashboard/stats").hasAnyRole("USER", "ROOM_ADMIN", "SYSTEM_ADMIN")
 
                 // 会议室管理
-                .requestMatchers("/api/admin/rooms/**", "/api/admin/statistics/**").hasRole("ROOM_ADMIN")
+                .requestMatchers("/api/admin/rooms/**", "/api/admin/statistics/**").hasAnyRole("ROOM_ADMIN", "SYSTEM_ADMIN")
 
                 // 系统管理
                 .requestMatchers("/api/admin/users/**", "/api/admin/settings/**", "/api/admin/logs/**").hasRole("SYSTEM_ADMIN")

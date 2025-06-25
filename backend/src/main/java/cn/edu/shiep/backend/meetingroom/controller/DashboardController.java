@@ -35,10 +35,10 @@ public class DashboardController {
 
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = LocalDate.now().atTime(23, 59, 59);
-        long todaysMeetings = reservationRepository.countByStartTimeBetweenAndStatus(startOfDay, endOfDay, ReservationStatus.CONFIRMED);
+        long todaysMeetings = reservationRepository.countByUser_UserIdAndStartTimeBetweenAndStatus(userId, startOfDay, endOfDay, ReservationStatus.CONFIRMED);
 
-        // 查找在未来还未结束的会议
-        long myUpcomingMeetings = reservationRepository.countByUser_UserIdAndEndTimeAfterAndStatus(userId, LocalDateTime.now(), ReservationStatus.CONFIRMED);
+        // 查找在当日之后还未结束的会议（不包括当日）
+        long myUpcomingMeetings = reservationRepository.countByUser_UserIdAndEndTimeAfterAndStatus(userId, endOfDay, ReservationStatus.CONFIRMED);
 
         DashboardStatsDTO stats = DashboardStatsDTO.builder()
                 .totalRooms(totalRooms)

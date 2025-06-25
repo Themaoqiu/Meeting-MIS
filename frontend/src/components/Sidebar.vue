@@ -2,6 +2,7 @@
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth';
 import { Button } from '@/components/ui/button'
+import { onMounted, ref } from 'vue'
 
 // 导入所有需要的图标
 import { 
@@ -12,10 +13,21 @@ import {
   BarChart,           // 状态看板 & 使用统计
   Settings,           // 会议室设置
   Users,              // 用户管理
-  CalendarCheck      // 会议日程
+  CalendarCheck,      // 会议日程
+  Bell               // 通知
 } from 'lucide-vue-next'
 
 const authStore = useAuthStore();
+const unreadCount = ref(0)
+
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/notices/my')
+    const notices = await res.json()
+    const lastReadId = Number(localStorage.getItem('lastReadNoticeId') || 0)
+    unreadCount.value = notices.filter((n:any) => n.id > lastReadId).length
+  } catch {}
+})
 </script>
 
 <template>
@@ -56,6 +68,16 @@ const authStore = useAuthStore();
         <RouterLink to="/calendar" active-class="bg-accent text-accent-foreground">
           <CalendarCheck class="mr-2 h-4 w-4" />
           会议日程
+        </RouterLink>
+      </Button>
+
+      <Button variant="ghost" class="justify-start relative" as-child>
+        <RouterLink to="/notices" active-class="bg-accent text-accent-foreground">
+          <Bell class="mr-2 h-4 w-4" />
+          我的通知
+          <span v-if="unreadCount > 0" class="ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold leading-none text-white bg-red-500 rounded-full">
+            {{ unreadCount }}
+          </span>
         </RouterLink>
       </Button>
 

@@ -11,6 +11,7 @@ import ManageRoomsView from '@/views/ManageRoomsView.vue';
 import StatisticsView from '@/views/StatisticsView.vue';
 import ManageUsersView from '@/views/ManageUsersView.vue';
 import MyCalendarView from '@/views/MyCalendarView.vue';
+import NoticesView from '@/views/NoticesView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -76,6 +77,12 @@ const router = createRouter({
       path: '/calendar',
       name: 'my-calendar',
       component: MyCalendarView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/notices',
+      name: 'notices',
+      component: NoticesView,
       meta: { requiresAuth: true }
     },
   ]

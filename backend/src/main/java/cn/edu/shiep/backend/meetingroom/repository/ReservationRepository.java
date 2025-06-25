@@ -24,6 +24,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     long countByUser_UserIdAndEndTimeAfterAndStatus(Long userId, LocalDateTime now, ReservationStatus status);
 
+    // 统计指定用户在指定时间段内的预约数量
+    @Query("SELECT COUNT(r) FROM Reservation r WHERE r.user.userId = :userId " +
+           "AND r.startTime BETWEEN :startTime AND :endTime " +
+           "AND r.status = :status")
+    long countByUser_UserIdAndStartTimeBetweenAndStatus(@Param("userId") Long userId,
+                                                       @Param("startTime") LocalDateTime startTime,
+                                                       @Param("endTime") LocalDateTime endTime,
+                                                       @Param("status") ReservationStatus status);
+
     // 查会议室在指定时间段冲突预约的数量
     @Query("SELECT COUNT(r) FROM Reservation r WHERE r.conferenceRoom.roomId = :roomId " +
             "AND r.status = 'CONFIRMED' " +

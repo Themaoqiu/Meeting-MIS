@@ -35,8 +35,7 @@ const handleCancel = async (id: number) => {
   try {
     await cancelReservation(id)
     toast.success('预约已取消')
-    // 刷新列表
-    fetchReservations()
+    window.location.reload()
   } catch (error: any) {
     toast.error('取消失败', {description: error.response?.data})
   }
@@ -53,6 +52,11 @@ const sortedReservations = computed(() => {
     return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
   });
 });
+
+// 判断会议是否已开始
+const canCancel = (r: Reservation) => {
+  return r.status === 'CONFIRMED' && new Date() < new Date(r.startTime);
+};
 </script>
 
 <template>
@@ -62,12 +66,12 @@ const sortedReservations = computed(() => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>主题</TableHead>
+            <TableHead class="text-left pl-6">主题</TableHead>
             <TableHead>会议室</TableHead>
             <TableHead>开始时间</TableHead>
             <TableHead>结束时间</TableHead>
             <TableHead>状态</TableHead>
-            <TableHead class="text-right">操作</TableHead>
+            <TableHead class="text-center">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -75,13 +79,13 @@ const sortedReservations = computed(() => {
             <TableCell colspan="6" class="text-center text-muted-foreground">您还没有任何预约</TableCell>
           </TableRow>
           <TableRow v-for="r in sortedReservations" :key="r.reservationId">
-            <TableCell>{{ r.theme }}</TableCell>
+            <TableCell class="pl-6">{{ r.theme }}</TableCell>
             <TableCell>{{ r.roomName }}</TableCell>
             <TableCell>{{ formatDateTime(r.startTime) }}</TableCell>
             <TableCell>{{ formatDateTime(r.endTime) }}</TableCell>
             <TableCell>{{ r.status }}</TableCell>
-            <TableCell class="text-right">
-              <AlertDialog v-if="r.status === 'CONFIRMED'">
+            <TableCell class="text-center">
+              <AlertDialog v-if="canCancel(r)">
                 <AlertDialogTrigger as-child>
                   <Button variant="destructive" size="sm">取消预约</Button>
                 </AlertDialogTrigger>

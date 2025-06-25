@@ -101,6 +101,7 @@ public class ReservationService {
         }
         reservation.setStatus(ReservationStatus.CANCELED);
         reservationRepository.save(reservation);
+        noticeService.createAndSendCancelNotice(reservation);
     }
     private ReservationResponse toResponseDTO(Reservation reservation) {
         return ReservationResponse.builder()

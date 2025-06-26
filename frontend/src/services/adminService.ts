@@ -44,3 +44,8 @@ export const updateUserRole = (userId: number, role: string) => {
 export const deleteUser = (userId: number) => {
     return apiClient.delete(`/admin/users/${userId}`);
 };
+
+// 新建用户
+export const createUser = (userData: any) => {
+  return apiClient.post(`/admin/users?role=${userData.role}`, userData);
+};

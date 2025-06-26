@@ -48,7 +48,14 @@ const roomStatusMap: Record<string, string> = {
     </CardContent>
 
     <CardFooter class="flex gap-2 pt-4 border-t">
-      <Button as-child class="w-full">
+      <Button 
+        v-if="room.status === 'MAINTENANCE'" 
+        disabled 
+        class="w-full bg-gray-300 text-gray-500 cursor-not-allowed"
+      >
+        维修中，不可预约
+      </Button>
+      <Button v-else as-child class="w-full">
         <RouterLink :to="`/reservations/new?roomId=${room.roomId}`">立即预约</RouterLink>
       </Button>
       <slot name="actions"></slot>

@@ -46,6 +46,16 @@ public class NoticeService {
             createNotice(reservation, content);
         }
     }
+    public void createAndSendCancelNotice(Reservation reservation) {
+        String content = String.format(
+            "【会议已取消预约】您预约的会议【%s】（会议室：%s，时间：%s - %s）已被取消。",
+            reservation.getTheme(),
+            reservation.getConferenceRoom().getName(),
+            reservation.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+            reservation.getEndTime().format(DateTimeFormatter.ofPattern("HH:mm"))
+        );
+        createNotice(reservation, content);
+    }
     private void createNotice(Reservation reservation, String content){
         Notice notice = new Notice();
         notice.setReservation(reservation);

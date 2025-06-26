@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PlusCircle, Trash2 } from 'lucide-vue-next';
+import { useAuthStore } from '@/stores/auth'
 
 const rooms = ref<any[]>([]);
 const isLoading = ref(true);
@@ -22,6 +23,7 @@ const roomToDelete = ref<any>(null);
 const equipmentTypes = ['PROJECTOR', 'WHITEBOARD', 'VIDEO_CONFERENCE', 'MICROPHONE'];
 const equipmentStatuses = ['AVAILABLE', 'FAULTY', 'MAINTENANCE'];
 const roomStatuses = ['AVAILABLE', 'MAINTENANCE'];
+const authStore = useAuthStore()
 
 const equipmentTypeMap: Record<string, string> = {
   'PROJECTOR': '投影仪',
@@ -41,6 +43,7 @@ const roomStatusMap: Record<string, string> = {
 
 
 const fetchRooms = async () => {
+  if (!authStore.isLoggedIn) return
   isLoading.value = true;
   try {
     const response = await getAllRooms();
@@ -77,7 +80,7 @@ const handleSave = async () => {
       toast.success('会议室创建成功！');
     }
     isDialogOpen.value = false;
-    fetchRooms();
+    window.location.reload();
   } catch (error: any) {
     toast.error('操作失败', { description: error.response?.data });
   }
@@ -184,21 +187,21 @@ const removeEquipment = (index: number) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>名称</TableHead>
+            <TableHead class="pl-6">名称</TableHead>
             <TableHead>容量</TableHead>
             <TableHead>状态</TableHead>
             <TableHead>设备数量</TableHead>
-            <TableHead class="text-right">操作</TableHead>
+            <TableHead class="text-right pr-16">操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           <TableRow v-if="isLoading"><TableCell :colspan="5" class="text-center">加载中...</TableCell></TableRow>
           <TableRow v-else v-for="room in rooms" :key="room.roomId">
-            <TableCell class="font-medium">{{ room.name }}</TableCell>
+            <TableCell class="font-medium pl-6">{{ room.name }}</TableCell>
             <TableCell>{{ room.capacity }}</TableCell>
             <TableCell>{{ roomStatusMap[room.status] || room.status }}</TableCell>
             <TableCell>{{ room.equipments.length }}</TableCell>
-            <TableCell class="text-right space-x-2">
+            <TableCell class="text-right pr-6 space-x-2">
               <Button variant="outline" size="sm" @click="openEditDialog(room)">编辑</Button>
               <AlertDialog>
                 <AlertDialogTrigger as-child>

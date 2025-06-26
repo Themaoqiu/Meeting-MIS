@@ -78,7 +78,7 @@ backend
 │   │   │           ├── entity           // JPA实体，对应数据库表映射
 │   │   │           ├── enums            // 用户角色 通知状态等的枚举类型 
 │   │   │           ├── repository       // JPA数据库操作接口
-│   │   │           ├── security         // Spring Security与 JWT 相关配置
+│   │   │           ├── security         // Spring Security所需的信息传递配置
 │   │   │           ├── service          // 业务逻辑服务层
 │   │   │           └── utils            // 
 │   │   └── resources                    // spring配置文件

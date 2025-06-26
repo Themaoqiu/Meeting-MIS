@@ -4,7 +4,6 @@ import 'vue-sonner/style.css'
 import { useAuthStore } from '@/stores/auth'
 import MainLayout from '@/layouts/MainLayout.vue'
 
-
 const authStore = useAuthStore()
 </script>
 

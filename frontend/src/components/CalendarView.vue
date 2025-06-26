@@ -50,7 +50,6 @@ const getReservationsForDay = (day: Date | null) => {
       // 未取消的排前面，已取消的排后面
       if (a.status !== 'CANCELED' && b.status === 'CANCELED') return -1;
       if (a.status === 'CANCELED' && b.status !== 'CANCELED') return 1;
-      // 其他按开始时间排序
       return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
     });
 }
@@ -68,10 +67,8 @@ const dayReservations = computed(() => {
       // 未取消的排前面，已取消的排后面
       if (a.status !== 'CANCELED' && b.status === 'CANCELED') return -1;
       if (a.status === 'CANCELED' && b.status !== 'CANCELED') return 1;
-      // 未完成的排前面，已完成的排后面
       if (!isCompleted(a) && isCompleted(b)) return -1;
       if (isCompleted(a) && !isCompleted(b)) return 1;
-      // 其他按开始时间排序
       return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
     });
 });
@@ -134,7 +131,7 @@ const fetchData = async () => {
 
 watch([currentDate, () => props.roomId, () => props.viewMode], fetchData, { immediate: true });
 
-// 检查预约是否已完成（已过当前时间）
+// 检查预约是否已完成
 const isCompleted = (reservation: any) => {
   const now = new Date();
   return new Date(reservation.endTime) < now;

@@ -66,8 +66,8 @@ const handleSubmit = async () => {
       ...reservation.value,
       roomId: Number(reservation.value.roomId),
       personNum: Number(reservation.value.personNum),
-      startTime: new Date(reservation.value.startTime).toISOString(),
-      endTime: new Date(reservation.value.endTime).toISOString(),
+      startTime: reservation.value.startTime,
+      endTime: reservation.value.endTime,
     });
     toast.success('预约成功！');
     router.push('/reservations/my');
